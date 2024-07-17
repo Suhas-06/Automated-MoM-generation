@@ -1,6 +1,6 @@
-transcript_file = 'C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\transcripts.txt'
-speaker_label_file = "C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\speaker.txt"
-output_sentence_file = "C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\preprocessed.txt"
+transcript_file = '\\temporary\\transcripts.txt'
+speaker_label_file = "\\temporary\\speaker.txt"
+output_sentence_file = "\\temporary\\preprocessed.txt"
 
 transcript_lines = []
 speaker_label_lines = []
