@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webex Meeting MoM Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2e2e2e; /* Dark gray background */
+            color: #fff; /* Light text */
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #3b3b3b; /* Lighter shade of dark gray background */
+        }
+        .content {
+            width: 90%;
+            max-width: 1200px; /* Increased container width */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px;
+            background-color: #4a4a4a; /* Even lighter gray background */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .left-section {
+            flex: 1;
+            padding: 20px;
+            text-align: left;
+        }
+        .right-section {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+        }
+        .upload-btn, .generate-btn, .download-btn {
+            padding: 12px 24px; /* Increased padding */
+            font-size: 18px; /* Increased font size */
+            cursor: pointer;
+            border: none;
+            background-color: #fff; /* White button */
+            color: #333; /* Dark text */
+            border-radius: 4px;
+            display: block;
+            margin: 20px auto;
+        }
+        .upload-btn:hover, .generate-btn:hover, .download-btn:hover {
+            background-color: #d3d3d3; /* Lightish gray on hover */
+        }
+        .generate-btn, .download-btn {
+            display: none; /* Initially hidden */
+        }
+        .status-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .status-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .loader {
+            border: 8px solid #f3f3f3; /* Light gray */
+            border-top: 8px solid #fff; /* White loader */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            display: none; /* Initially hidden */
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .mom-content {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            text-align: left;
+            overflow: auto;
+            max-height: 400px;
+            color: #333; /* Dark text for content */
+        }
+    </style>    
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="left-section">
+                <h2>Welcome to Our Website</h2>
+                <p>This website allows you to upload an MP4 file from Webex meetings and generate Minutes of Meeting (MoM) documents.</p>
+                <h3>Key Features:</h3>
+                <ul>
+                    <li>Convert MP4 videos/Webex meeting recordings to MP3 files securely</li>
+                    <li>Generate transcripts with speaker labels using <strong>Watson Speech to Text</strong></li>
+                    <li>Convert transcripts into Minutes of Meeting (MoM) documents using <strong>llama-3-70b-instruct model</strong></li>
+                    <li>Includes meeting summary, key meeting points, and action items with owners</li>
+                    <li>Can download the MoM document in word format too!</li>
+                </ul>
+            </div>
+            <div class="right-section">
+                <h2>Upload MP4 File</h2>
+                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                    <input type="file" id="mp4File" name="mp4File" accept=".mp4" style="display: none;">
+                    <label for="mp4File" class="upload-btn">Choose MP4 File</label>
+                </form>
+                <p id="uploadedFile"></p>
+                <button id="generateMoMBtn" class="generate-btn">Generate MoM Document</button>
+                <div class="status-container">
+                    <div id="conversionStatus" class="status-text"></div>
+                    <div id="momContent" class="mom-content"></div>
+                    <a id="downloadLink" href="#" class="download-btn" download="MoM_Document.doc">Download MoM Document</a>
+                    <div class="loader" id="loader"></div>
+                </div>
+
+                <h2>Upload Transcript File</h2>
+                <form id="uploadTranscriptForm" action="/upload_transcript" method="post" enctype="multipart/form-data">
+                    <input type="file" id="transcriptFile" name="transcriptFile" accept=".txt" style="display: none;">
+                    <label for="transcriptFile" class="upload-btn">Choose Transcript File</label>
+                </form>
+                <p id="uploadedTranscript"></p>
+                <button id="generateMoMFromTranscriptBtn" class="generate-btn">Generate MoM Document from Transcript</button>
+                <div class="status-container">
+                    <div id="transcriptConversionStatus" class="status-text"></div>
+                    <div id="momContentFromTranscript" class="mom-content"></div>
+                    <a id="downloadLinkFromTranscript" href="#" class="download-btn" download="MoM_Document.doc">Download MoM Document</a>
+                    <div class="loader" id="loaderFromTranscript"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mp4File').addEventListener('change', function() {
+            var form = document.getElementById('uploadForm');
+            var formData = new FormData(form);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to upload MP4 file.');
+                }
+            })
+            .then(data => {
+                var uploadedFileElement = document.getElementById('uploadedFile');
+                uploadedFileElement.innerHTML = `Uploaded MP4 File: ${data.filename}`;
+                var generateMoMBtn = document.getElementById('generateMoMBtn');
+                generateMoMBtn.style.display = 'block';
+
+                // Add click event listener to generate MoM button
+                generateMoMBtn.addEventListener('click', function() {
+                    var loader = document.getElementById('loader');
+                    loader.style.display = 'block';
+                    executeWorkflow(data.filename);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to upload MP4 file.');
+            });
+        });
+
+        document.getElementById('transcriptFile').addEventListener('change', function() {
+            var form = document.getElementById('uploadTranscriptForm');
+            var formData = new FormData(form);
+
+            fetch('/upload_transcript', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to upload transcript file.');
+                }
+            })
+            .then(data => {
+                var uploadedTranscriptElement = document.getElementById('uploadedTranscript');
+                uploadedTranscriptElement.innerHTML = `Uploaded Transcript File: ${data.filename}`;
+                var generateMoMFromTranscriptBtn = document.getElementById('generateMoMFromTranscriptBtn');
+                generateMoMFromTranscriptBtn.style.display = 'block';
+
+                // Add click event listener to generate MoM from Transcript button
+                generateMoMFromTranscriptBtn.addEventListener('click', function() {
+                    var loader = document.getElementById('loaderFromTranscript');
+                    loader.style.display = 'block';
+                    executeWorkflowFromTranscript(data.filename);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to upload transcript file.');
+            });
+        });
+
+        function executeWorkflow(filename) {
+            var loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            fetch('/run_workflow', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ filename: filename })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to generate MoM document.');
+                }
+            })
+            .then(data => {
+                var momContent = document.getElementById('momContent');
+                momContent.textContent = data.result;  // Assuming data.result directly contains MoM content
+
+                var downloadLink = document.getElementById('downloadLink');
+                downloadLink.setAttribute('href', '/download_mom');
+                downloadLink.style.display = 'block';
+
+                var loader = document.getElementById('loader');
+                loader.style.display = 'none';  // Hide loader once MoM content is received
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate MoM document.');
+            });
+        }
+
+        function executeWorkflowFromTranscript(filename) {
+            var loader = document.getElementById('loaderFromTranscript');
+            loader.style.display = 'block';
+
+            fetch('/run_workflow_from_transcript', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ filename: filename })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to generate MoM document from transcript.');
+                }
+            })
+            .then(data => {
+                var momContentFromTranscript = document.getElementById('momContentFromTranscript');
+                momContentFromTranscript.textContent = data.result;  // Assuming data.result directly contains MoM content
+
+                var downloadLinkFromTranscript = document.getElementById('downloadLinkFromTranscript');
+                downloadLinkFromTranscript.setAttribute('href', '/download_mom');
+                downloadLinkFromTranscript.style.display = 'block';
+
+                var loader = document.getElementById('loaderFromTranscript');
+                loader.style.display = 'none';  // Hide loader once MoM content is received
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate MoM document from transcript.');
+            });
+        }
+    </script>
+</body>
+</html>
