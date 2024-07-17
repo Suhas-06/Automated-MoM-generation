@@ -2,8 +2,8 @@ from ibm_watson import SpeechToTextV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import os
 
-api_key = 'L75IwGXXbYuIUBSB35WoFeb4UFAr70AUA55qvwAt9X_x'
-service_url = "https://api.us-south.speech-to-text.watson.cloud.ibm.com/instances/444c0361-5bf3-49fa-860e-aa5f5cf20b04"
+api_key = 'YOUR API KEY'
+service_url = "https://api.us-south.speech-to-text.watson.cloud.ibm.com/instances/YOUR INSTANCE ID"
 
 authenticator = IAMAuthenticator(api_key)
 speech_to_text = SpeechToTextV1(authenticator=authenticator)
@@ -34,7 +34,7 @@ def transcribe_audio(file_path, transcript_output_file, speaker_output_file, tim
             for speaker_label in speaker_labels:
                 speaker_file.write(f"Speaker: {speaker_label['speaker']}, Start: {speaker_label['from']}, End: {speaker_label['to']}\n")
 
-input_file_path = 'C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\audio.mp3'
-transcript_output_file = 'C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\transcripts.txt'
-speaker_output_file = 'C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\speaker.txt'
+input_file_path = '\\temporary\\audio.mp3'
+transcript_output_file = '\\temporary\\transcripts.txt'
+speaker_output_file = '\\temporary\\speaker.txt'
 transcribe_audio(input_file_path, transcript_output_file, speaker_output_file)
