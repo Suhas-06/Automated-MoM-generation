@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Define paths
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'mp4'}
-OUTPUT_FOLDER = 'C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary'
+OUTPUT_FOLDER = '\\temporary'
 OUTPUT_FILE = 'MoM_Document.doc'  # Adjust this for your output format
 
 # Ensure upload folder exists
@@ -97,7 +97,7 @@ def run_workflow(mp4_file):
         print("Processed the transcript")
         
         # Execute MoM.py (generates MoM document)
-        file_path = "C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\preprocessed.txt"
+        file_path = "\\temporary\\preprocessed.txt"
         subprocess.run(['python', 'MoM.py' ,file_path], check=True)
         print("Generated MoM document")
 
