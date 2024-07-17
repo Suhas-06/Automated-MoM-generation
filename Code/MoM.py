@@ -8,8 +8,8 @@ from langchain import LLMChain
 
 # Initialize Watsonx LLM model
 def initialize_watsonx_llm():
-    api_key = "JgdZIPixBAfWfZM5M-pjvmYSq3Tu9fM6feEFgOmKKLzc"
-    project_id = "799a874a-ae70-4504-b5ee-b5daed479cca"
+    api_key = "YOUR API KEY"
+    project_id = "YOUR PROJECT ID"
     credentials = {
         "url": "https://us-south.ml.cloud.ibm.com",
         "apikey": api_key
@@ -103,7 +103,7 @@ if lines[-1].strip().startswith("Let me know"):
     response_text = "\n".join(lines[:-1])
 
 print(response_text)
-output_file = "C:\\Users\\SuhasGowda\\Desktop\\Code\\meeting_summary\\temporary\\MoM_Document.doc"  # Change the file name as needed
+output_file = "\\temporary\\MoM_Document.doc"  # Change the file name as needed
 
 with open(output_file, 'w', encoding='utf-8') as f:
     f.write(response_text)
