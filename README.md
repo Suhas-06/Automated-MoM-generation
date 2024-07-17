@@ -32,9 +32,25 @@ This project streamlines meeting management through a user-friendly web interfac
 - **LLAMA-3-70b-instruct Model**: Generates Minutes of Meeting documents, including summaries and action items.
 - **Flask and HTML API**: Facilitates backend communication and frontend rendering for user interactions.
 
+## Prerequisites
+
+Before running the project, ensure you have the following:
+
+- An IBM API key for using IBM models.
+- File paths for any local files you need to reference.
+
+## Setup
+
+- Replace API Keys and URLs.
+- Update File Paths: Replace all placeholder file paths in the scripts with your actual file paths.
+- Install Dependencies: Install the necessary Python packages using pip.
+
 ## Usage
 
-1. Run the Flask application using:
-   ```bash
-   python app.py
-2. Access the web interface at http://127.0.0.1:5000 and upload your MP4 or transcript files.
+### Run the Flask Application:
+- To start the application, run:
+```bash
+python QnA.py
+```
+### Access the Application:
+- Open a web browser and navigate to http://127.0.0.1:5000 to use the application locally
