@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Define paths
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'mp4'}
-OUTPUT_FOLDER = '\\temporary'
+OUTPUT_FOLDER = '\temporary'
 OUTPUT_FILE = 'MoM_Document.doc'  # Adjust this for your output format
 
 # Ensure upload folder exists
